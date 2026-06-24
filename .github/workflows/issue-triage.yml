@@ -1,0 +1,48 @@
+name: Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    if: ${{ github.event.issue.user.type != 'Bot' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude issue triage
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: '--allowed-tools "Bash(gh issue view:*),Bash(gh issue edit:*),Bash(gh issue comment:*),Bash(gh label list:*),Bash(gh label create:*)"'
+          additional_permissions: |
+            issues: write
+          prompt: |
+            Eres responsable del triage del issue #${{ github.event.issue.number }} de este repositorio.
+
+            Pasos:
+            1. Lee el issue con `gh issue view ${{ github.event.issue.number }}`.
+            2. Revisa los labels disponibles con `gh label list`.
+            3. Asigna los labels más apropiados con
+               `gh issue edit ${{ github.event.issue.number }} --add-label "<label>"`.
+               Si ningún label existente describe bien el problema, crea uno con
+               `gh label create "<nombre>" --description "<desc>" --color "<hex>"` y luego asígnalo.
+               Sugerencias de categorías nuevas si aplican: `priority:high`, `priority:medium`,
+               `priority:low`, `area:rendering`, `area:game-logic`, `area:input`, `area:ui`.
+            4. Publica UN solo comentario en español en el issue con
+               `gh issue comment ${{ github.event.issue.number }} --body "<diagnóstico>"`.
+               El comentario debe incluir:
+               - **Resumen** del problema reportado.
+               - **Causa probable** (basándote en el código del repo: game.js, index.html, style.css).
+               - **Enfoque de solución sugerido** (archivos y funciones a modificar), para guiar la
+                 implementación posterior.
+            5. NO edites el título ni el cuerpo del issue. Solo añade labels y publica un comentario.
