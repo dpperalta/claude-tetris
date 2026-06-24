@@ -38,11 +38,21 @@ jobs:
                `gh label create "<nombre>" --description "<desc>" --color "<hex>"` y luego asígnalo.
                Sugerencias de categorías nuevas si aplican: `priority:high`, `priority:medium`,
                `priority:low`, `area:rendering`, `area:game-logic`, `area:input`, `area:ui`.
-            4. Publica UN solo comentario en español en el issue con
-               `gh issue comment ${{ github.event.issue.number }} --body "<diagnóstico>"`.
-               El comentario debe incluir:
-               - **Resumen** del problema reportado.
-               - **Causa probable** (basándote en el código del repo: game.js, index.html, style.css).
-               - **Enfoque de solución sugerido** (archivos y funciones a modificar), para guiar la
-                 implementación posterior.
+            4. Publica UN solo comentario en español en el issue usando GitHub-Flavored Markdown.
+               Usa `gh issue comment ${{ github.event.issue.number }} --body "<diagnóstico>"`.
+               El comentario debe seguir esta estructura Markdown:
+
+               ## 🔍 Diagnóstico del Issue
+
+               ### Resumen
+               (Descripción clara del problema reportado)
+
+               ### Causa Probable
+               (Análisis técnico basado en el código del repo: `game.js`, `index.html`, `style.css`.
+               Usa bloques de código con \`\`\`js cuando referencíes fragmentos de código relevantes)
+
+               ### Enfoque de Solución Sugerido
+               (Lista con los archivos y funciones a modificar, usando una checklist Markdown:
+               - [ ] `archivo.js` — función `nombreFuncion()`: descripción del cambio
+               )
             5. NO edites el título ni el cuerpo del issue. Solo añade labels y publica un comentario.
