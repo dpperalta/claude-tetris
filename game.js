@@ -275,6 +275,7 @@ function loop(ts) {
       lockPiece();
     }
   }
+  if (gameOver) return;        // endGame() ya mostró el overlay; no reprogramar ni dibujar más
   draw();
   animId = requestAnimationFrame(loop);
 }
