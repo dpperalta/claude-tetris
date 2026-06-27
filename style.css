@@ -273,3 +273,103 @@ kbd {
 #restart-btn:hover {
   background: var(--btn-hover);
 }
+
+/* ---- Pause menu ---- */
+.pm-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: stretch;
+  width: 220px;
+  margin-top: 4px;
+}
+
+.pm-menu.hidden {
+  display: none;
+}
+
+.pm-btn {
+  background: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+  border-radius: 6px;
+  padding: 10px 0;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pm-btn:hover {
+  background: var(--btn-hover);
+}
+
+.pm-level {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.pm-level-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--label);
+  font-weight: 600;
+}
+
+.pm-stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pm-step {
+  background: var(--kbd-bg);
+  border: 1px solid var(--kbd-border);
+  color: var(--accent);
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pm-step:hover {
+  background: var(--btn-hover);
+  color: var(--btn-text);
+}
+
+.pm-level-value {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 36px;
+  text-align: center;
+}
+
+.pm-controls-panel {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.pm-controls-panel.hidden {
+  display: none;
+}
+
+.pm-controls-panel li {
+  font-size: 12px;
+  color: var(--control-text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
