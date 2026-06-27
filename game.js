@@ -595,7 +595,7 @@ function showStartScreen() {
 
 document.addEventListener('keydown', e => {
   if (e.code === 'KeyP' || e.code === 'Escape') { togglePause(); return; }
-  if (paused || gameOver) return;
+  if (paused || gameOver || !current) return;   // sin partida en curso no se procesan inputs
   switch (e.code) {
     case 'ArrowLeft':
       if (!collide(current.shape, current.x - 1, current.y)) current.x--;
