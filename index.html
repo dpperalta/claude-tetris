@@ -58,6 +58,29 @@
         <p id="overlay-title">GAME OVER</p>
         <p id="overlay-score"></p>
         <button id="restart-btn">Reiniciar</button>
+
+        <div id="pause-menu" class="pm-menu hidden">
+          <button class="pm-btn" id="pm-resume">Reanudar</button>
+          <button class="pm-btn" id="pm-restart">Reiniciar</button>
+          <button class="pm-btn" id="pm-controls">Ver controles</button>
+
+          <div class="pm-level">
+            <span class="pm-level-label">Nivel inicial</span>
+            <div class="pm-stepper">
+              <button class="pm-step" id="pm-level-dec" type="button">−</button>
+              <span class="pm-level-value" id="pm-level-value">1</span>
+              <button class="pm-step" id="pm-level-inc" type="button">+</button>
+            </div>
+          </div>
+
+          <ul id="pm-controls-panel" class="pm-controls-panel hidden">
+            <li><kbd>←</kbd><kbd>→</kbd> mover</li>
+            <li><kbd>↑</kbd><kbd>X</kbd> rotar</li>
+            <li><kbd>↓</kbd> bajar</li>
+            <li><kbd>Space</kbd> caída</li>
+            <li><kbd>P</kbd><kbd>Esc</kbd> pausa</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
