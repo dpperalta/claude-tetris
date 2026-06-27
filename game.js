@@ -85,6 +85,23 @@ setStartLevel(startLevel);
 pmLevelDec.addEventListener('click', () => setStartLevel(startLevel - 1));
 pmLevelInc.addEventListener('click', () => setStartLevel(startLevel + 1));
 
+const skinSelect = document.getElementById('skin-select');
+
+// ---- Skins (visual themes), orthogonal to light/dark ----
+// Each skin has a palette (mirrors COLORS index 1..8) and a draw strategy.
+const PASTEL_COLORS = [
+  null, '#a8e6e6', '#fff1a8', '#dcb8e6', '#bfe6bf',
+  '#f2b8b8', '#c4dbf7', '#ffd9a8', '#d4dde2',
+];
+const SKINS = {
+  retro: { colors: COLORS, draw: drawBlockRetro },
+  neon: { colors: COLORS, draw: drawBlockNeon },
+  pastel: { colors: PASTEL_COLORS, draw: drawBlockPastel },
+  pixel: { colors: COLORS, draw: drawBlockPixel },
+};
+let activeSkin = 'retro';
+let started = false;
+
 let gridStroke = '#22222e';
 let blockHighlight = 'rgba(255,255,255,0.12)';
 
@@ -176,6 +193,27 @@ function escapeHtml(str) {
 }
 
 let board, current, next, score, lines, level, paused, gameOver, lastTime, dropAccum, dropInterval, animId, combo, maxCombo;
+
+function applySkin(skin) {
+  if (!SKINS[skin]) skin = 'retro';
+  activeSkin = skin;
+  for (const name of Object.keys(SKINS)) {
+    document.body.classList.toggle('skin-' + name, name === skin);
+  }
+  if (skinSelect) skinSelect.value = skin;
+  localStorage.setItem('tetris-skin', skin);
+  updateThemeColors();
+  // Re-render immediately. Guarded by `started` because the initial
+  // applySkin() call runs before init() has created board/next.
+  if (started) { draw(); drawNext(); }
+}
+
+if (skinSelect) skinSelect.addEventListener('change', () => applySkin(skinSelect.value));
+
+(function initSkin() {
+  const saved = localStorage.getItem('tetris-skin');
+  applySkin(saved || 'retro');
+})();
 
 function createBoard() {
   return Array.from({ length: ROWS }, () => new Array(COLS).fill(0));
@@ -298,15 +336,82 @@ function updateHUD() {
   levelEl.textContent = level;
 }
 
+function skinColor(colorIndex) {
+  const pal = SKINS[activeSkin].colors;
+  return pal[colorIndex] || COLORS[colorIndex];
+}
+
 function drawBlock(context, x, y, colorIndex, size, alpha) {
   if (!colorIndex) return;
-  const color = COLORS[colorIndex];
   context.globalAlpha = alpha ?? 1;
-  context.fillStyle = color;
-  context.fillRect(x * size + 1, y * size + 1, size - 2, size - 2);
-  context.fillStyle = blockHighlight;
-  context.fillRect(x * size + 1, y * size + 1, size - 2, 4);
+  SKINS[activeSkin].draw(context, x, y, colorIndex, size);
   context.globalAlpha = 1;
+}
+
+// --- Retro: flat squares + white highlight strip (original look) ---
+function drawBlockRetro(context, x, y, colorIndex, size) {
+  const px = x * size + 1, py = y * size + 1, s = size - 2;
+  context.fillStyle = skinColor(colorIndex);
+  context.fillRect(px, py, s, s);
+  context.fillStyle = blockHighlight;
+  context.fillRect(px, py, s, 4);
+}
+
+// --- Neon: glowing blocks via shadowBlur/shadowColor ---
+function drawBlockNeon(context, x, y, colorIndex, size) {
+  const px = x * size + 1, py = y * size + 1, s = size - 2;
+  const color = skinColor(colorIndex);
+  context.save();
+  context.shadowColor = color;
+  context.shadowBlur = size * 0.5;
+  context.fillStyle = color;
+  context.fillRect(px, py, s, s);
+  // second pass to intensify the glow
+  context.fillRect(px, py, s, s);
+  context.restore();
+  context.shadowBlur = 0;
+}
+
+// --- Pastel: soft palette with rounded-rect fill ---
+function drawBlockPastel(context, x, y, colorIndex, size) {
+  const px = x * size + 1, py = y * size + 1, s = size - 2;
+  const r = Math.max(3, size * 0.22);
+  context.fillStyle = skinColor(colorIndex);
+  roundRect(context, px, py, s, s, r);
+  context.fill();
+  context.fillStyle = blockHighlight;
+  roundRect(context, px, py, s, s * 0.35, r);
+  context.fill();
+}
+
+// --- Pixel art: base fill + pixel texture overlay ---
+function drawBlockPixel(context, x, y, colorIndex, size) {
+  const px = x * size + 1, py = y * size + 1, s = size - 2;
+  context.fillStyle = skinColor(colorIndex);
+  context.fillRect(px, py, s, s);
+  const cell = Math.max(2, Math.floor(size / 6));
+  context.fillStyle = 'rgba(0,0,0,0.18)';
+  for (let gy = 0; gy * cell < s; gy++) {
+    for (let gx = 0; gx * cell < s; gx++) {
+      if ((gx + gy) % 2 === 0) continue;
+      context.fillRect(px + gx * cell, py + gy * cell, cell, cell);
+    }
+  }
+  // light bevel on top/left
+  context.fillStyle = 'rgba(255,255,255,0.22)';
+  context.fillRect(px, py, s, cell);
+  context.fillRect(px, py, cell, s);
+}
+
+function roundRect(context, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.arcTo(x + w, y, x + w, y + h, r);
+  context.arcTo(x + w, y + h, x, y + h, r);
+  context.arcTo(x, y + h, x, y, r);
+  context.arcTo(x, y, x + w, y, r);
+  context.closePath();
 }
 
 function drawGrid() {
@@ -456,6 +561,7 @@ function loop(ts) {
 }
 
 function init() {
+  started = true;
   board = createBoard();
   score = 0;
   lines = 0;
