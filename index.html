@@ -57,6 +57,11 @@
       <div class="overlay-box">
         <p id="overlay-title">GAME OVER</p>
         <p id="overlay-score"></p>
+        <div id="hs-name-row" class="hs-name-row hidden">
+          <input type="text" id="hs-name-input" maxlength="12" placeholder="Tu nombre" />
+          <button id="hs-save-btn">Guardar</button>
+        </div>
+        <div id="overlay-highscores" class="hs-wrapper"></div>
         <button id="restart-btn">Reiniciar</button>
 
         <div id="pause-menu" class="pm-menu hidden">
@@ -80,6 +85,17 @@
             <li><kbd>Space</kbd> caída</li>
             <li><kbd>P</kbd><kbd>Esc</kbd> pausa</li>
           </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="start-overlay" class="overlay hidden">
+      <div class="overlay-box">
+        <p id="start-title">TETRIS</p>
+        <div id="start-highscores" class="hs-wrapper"></div>
+        <div class="hs-actions">
+          <button id="play-btn">Jugar</button>
+          <button id="hs-reset-btn" class="hs-reset-btn">Borrar récords</button>
         </div>
       </div>
     </div>
